@@ -1,0 +1,4 @@
+name: AvalonyaAPI
+version: '${project.version}'
+main: eu.avalonya.api.AvalonyaAPI
+api-version: '1.20'
