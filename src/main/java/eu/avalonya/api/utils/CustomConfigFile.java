@@ -1,31 +1,33 @@
 package eu.avalonya.api.utils;
 
-import eu.avalonya.api.AvalonyaAPI;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
 
 public class CustomConfigFile
 {
-        private String filename;
+        private final String filename;
         private  File file;
         private FileConfiguration customFile;
+        private final JavaPlugin javaInstance;
 
-        public CustomConfigFile(String filename)
+        public CustomConfigFile(JavaPlugin javaInstance, String filename, String key)
         {
             this.filename = filename;
+            this.javaInstance = javaInstance;
             this.setup();
-            ConfigFilesManager.putFile("sql", this);
+            ConfigFilesManager.putFile(key, this);
         }
         public void setup()
         {
-            file = new File(AvalonyaAPI.getInstance().getDataFolder(), this.filename);
+            file = new File(this.javaInstance.getDataFolder(), this.filename);
 
             if (!file.exists())
             {
-                AvalonyaAPI.getInstance().saveResource(filename, false);
+                this.javaInstance.saveResource(filename, false);
             }
             this.customFile = YamlConfiguration.loadConfiguration(file);
         }

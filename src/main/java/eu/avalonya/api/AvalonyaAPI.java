@@ -19,7 +19,7 @@ public class AvalonyaAPI extends JavaPlugin
     {
         instance = this;
 
-        CustomConfigFile sqlConfig = new CustomConfigFile("database.yml");
+        CustomConfigFile sqlConfig = new CustomConfigFile(AvalonyaAPI.getInstance(), "database.yml", "sql");
 
         FileConfiguration fSql = ConfigFilesManager.getFile("sql").get();
 
