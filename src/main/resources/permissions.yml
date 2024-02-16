@@ -1,0 +1,33 @@
+ranks:
+  admin:
+    rankId: 100 # Ne pas modifier
+    permissions:
+      - "*.*"
+  resp:
+    rankId: 90 # Ne pas modifier
+    permissions:
+      - "*.*"
+  sys_admin:
+    rankId: 80 # Ne pas modifier
+    permissions:
+      - "*.*"
+  dev:
+    rankId: 70 # Ne pas modifier
+    permissions:
+      - "*.*"
+  conf:
+    rankId: 60 # Ne pas modifier
+    permissions:
+      - "*.*"
+  builder:
+    rankId: 50 # Ne pas modifier
+    permissions:
+      - "*.*"
+  writer:
+    rankId: 40 # Ne pas modifier
+    permissions:
+      - "*.*"
+  player:
+    rankId: 0 # Ne pas modifier
+    permissions:
+      - rien
