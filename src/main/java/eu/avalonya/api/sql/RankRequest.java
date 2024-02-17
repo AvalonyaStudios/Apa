@@ -2,6 +2,7 @@ package eu.avalonya.api.sql;
 
 import eu.avalonya.api.AvalonyaAPI;
 import eu.avalonya.api.models.AvalonyaPlayer;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.sql.Connection;
@@ -42,8 +43,9 @@ public class RankRequest
         }
     }
 
-    public static boolean isPlayerExistsInDB(Player p)
+    public static boolean isPlayerExistsInDB(OfflinePlayer p)
     {
+        AvalonyaAPI.getInstance().getLogger().info(p.getName() + "-" + p.getUniqueId());
         try
         {
             Connection connection = AvalonyaAPI.getSqlInstance().getConnection();
@@ -85,6 +87,33 @@ public class RankRequest
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void setRankInDb(OfflinePlayer p, int rankId) throws Exception
+    {
+        if(isPlayerExistsInDB(p))
+        {
+            AvalonyaAPI.getInstance().getLogger().info("SQL - setRankInDb [" + p.getName() + "]");
+            PreparedStatement r;
+            try
+            {
+                r = AvalonyaAPI.getSqlInstance().getConnection().prepareStatement("UPDATE `player` SET `rank_id` = "
+                        + rankId
+                        + " WHERE `uuid` = '" + p.getUniqueId() + "'");
+                r.execute();
+                r.close();
+            }
+            catch (IllegalArgumentException | SQLException e)
+            {
+                AvalonyaAPI.getInstance().getLogger().severe("SQL - setRankInDb - [" + p.getName() + "] : " + e.getMessage());
+                e.printStackTrace();
+                throw new Exception("Error during SQL request !");
+            }
+        }
+        else
+        {
+            AvalonyaAPI.getInstance().getLogger().warning("Trying to set rank to an unknown user !");
+        }
     }
 
 }

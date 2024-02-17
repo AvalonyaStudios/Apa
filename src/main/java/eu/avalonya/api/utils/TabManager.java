@@ -37,12 +37,8 @@ public class TabManager
     {
         Rank rank = avalonyaPlayer.getRank();
         Player player = avalonyaPlayer.getPlayer();
-
-        if (rank != Rank.PLAYER)
-        {
-            scoreboard.getTeam(rank.getOrderTab()).addPlayer(player);
-            player.setDisplayName(MessageUtils.convertColor(avalonyaPlayer.getRank().getPrefixTab() + player.getName()));
-        }
+        scoreboard.getTeam(rank.getOrderTab()).addPlayer(player);
+        player.setDisplayName(MessageUtils.convertColor(avalonyaPlayer.getRank().getPrefixTab() + player.getName()));
         updateTab();
     }
 

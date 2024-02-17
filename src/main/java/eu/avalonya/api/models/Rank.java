@@ -3,7 +3,9 @@ package eu.avalonya.api.models;
 import eu.avalonya.api.utils.MessageUtils;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +22,7 @@ public enum Rank
     CONF("Configurateur", "§b§lConfigurateur ", "§b[Config] ", "§f", "§b", "E_admin", 60),
     BUILDER("Builder", "§a§lBuilder ", "§a[Builder] ", "§f", "§a", "F_admin", 50),
     WRITER("Scénariste", "§2§lScénariste ", "§2[Scénariste] ", "§f", "§2", "G_admin", 40),
-    PLAYER("Joueur", "§7§l ", "§7 ", "§7", "§7", "z_admin", 0);
+    PLAYER("Joueur", "§7§l", "§7", "§7", "§7", "Z_admin", 0);
 
     private String name;
     private String prefixChat;
@@ -60,6 +62,28 @@ public enum Rank
             p.sendMessage(MessageUtils.convertColor(rank.getPrefixChat() + rank.getColorName() + p.getName()));
             p.sendMessage(MessageUtils.convertColor(rank.getPrefixTab() + rank.getColorName() + p .getName()));
         }
+    }
+
+    public static int getIdFromName(String name)
+    {
+        for (Rank rank : Rank.values())
+        {
+            if (rank.name.equals(name))
+            {
+                return rank.rankId;
+            }
+        }
+        return -1;
+    }
+
+    public static ArrayList<String> getRanksName()
+    {
+        ArrayList<String> ranks = new ArrayList<>();
+        for (Rank rank : Rank.values())
+        {
+            ranks.add(rank.getName());
+        }
+        return ranks;
     }
 
     public String getName()
