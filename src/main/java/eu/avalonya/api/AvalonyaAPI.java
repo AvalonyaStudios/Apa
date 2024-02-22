@@ -34,8 +34,8 @@ public class AvalonyaAPI extends JavaPlugin
 
         manageMigration();
 
-        BaseCommand.register(this, new DemoCommand());
-        BaseCommand.register(this, new SetRankCommand());
+        new DemoCommand().register(this);
+        new SetRankCommand().register(this);
 
         PermissionManager.loadPermissionsFromConfigFileToCache();
     }

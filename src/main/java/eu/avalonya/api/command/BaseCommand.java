@@ -178,15 +178,16 @@ public abstract class BaseCommand implements CommandExecutor, ICommand, TabCompl
         return new ArrayList<>(completions);
     }
 
-    public static void register(@NotNull JavaPlugin plugin, @NotNull BaseCommand command) {
-        final PluginCommand pluginCommand = plugin.getCommand(command.getName());
+    public void register(JavaPlugin plugin)
+    {
+        final PluginCommand pluginCommand = plugin.getCommand(this.getName());
 
         if (pluginCommand == null) {
-            plugin.getLogger().severe("Impossible de trouver la commande " + command.getName());
+            plugin.getLogger().severe("Impossible de trouver la commande " + this.getName());
             return;
         }
-        pluginCommand.setExecutor(command);
-        pluginCommand.setTabCompleter(command);
+        pluginCommand.setExecutor(this);
+        pluginCommand.setTabCompleter(this);
     }
 
     public enum SenderType {
