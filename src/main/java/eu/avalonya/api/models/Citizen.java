@@ -17,6 +17,7 @@ public class Citizen implements ItemAccess {
     private ItemStack playerHead;
     private Town town;
     private long joinedAt;
+    private Role role;
 
     public Citizen(OfflinePlayer player) {
         this.player = player;
@@ -66,9 +67,16 @@ public class Citizen implements ItemAccess {
         return player.getPlayer();
     }
 
+    public void setRole(Role role){
+        this.role = role;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
     @Override
     public ItemStack toItemStack() {
         return playerHead;
     }
-
 }

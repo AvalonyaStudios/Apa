@@ -1,5 +1,6 @@
 package eu.avalonya.api.models;
 
+import eu.avalonya.api.exceptions.TownRoleLimiteException;
 import eu.avalonya.api.items.ItemAccess;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Chunk;
@@ -9,10 +10,9 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Town model class that represents a town in the Avalonya api.
@@ -36,6 +36,7 @@ public class Town implements ItemAccess {
     private final List<Town> enemies = new ArrayList<>();
     private final List<Town> allies = new ArrayList<>();
     private List<Pattern> bannerPatterns = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 
     public Town(String name, Citizen mayor) {
         this.name = name;
@@ -47,6 +48,9 @@ public class Town implements ItemAccess {
         );
 
         spawn = createSpawn();
+        roles.add(
+                new Role("citizen", Role.Color.CITIZEN)
+        );
     }
 
     public String getName() {
@@ -119,7 +123,8 @@ public class Town implements ItemAccess {
         return claims;
     }
 
-    public void addCitizen(Citizen citizen) {
+    public void addCitizen(@NotNull Citizen citizen) {
+        citizen.setRole(roles.get(0));
         citizens.add(citizen);
     }
 
@@ -246,6 +251,44 @@ public class Town implements ItemAccess {
 
     public List<Pattern> getBannerMeta() {
         return bannerPatterns;
+    }
+
+    public void addRole(String name) throws TownRoleLimiteException{
+
+        if (this.roles.size() >= 4) {
+            throw new TownRoleLimiteException();
+        }
+        addRole(new Role(name, Role.Color.values()[this.roles.size()]));
+    }
+
+    public void addRole(Role role) throws TownRoleLimiteException {
+
+        if (this.roles.size() >= 4) {
+            throw new TownRoleLimiteException();
+        }
+        this.roles.add(role);
+    }
+
+    public Role getRole(Role.Color color) {
+        for (Role role : this.roles) {
+            if (role.getColor().equalsIgnoreCase(color.getColor())) {
+                return role;
+            }
+        }
+        return null;
+    }
+
+    public Role getRole(String name) {
+        for (Role role : this.roles) {
+            if (role.getName().equalsIgnoreCase(name)) {
+                return role;
+            }
+        }
+        return null;
+    }
+
+    public List<Role> getRoles() {
+        return this.roles;
     }
 
     @Override
