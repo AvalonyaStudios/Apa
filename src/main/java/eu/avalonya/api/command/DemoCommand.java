@@ -29,7 +29,9 @@ public class DemoCommand extends BaseCommand<Player>
     {
         sender.sendMessage("oui");
         sender.sendMessage("Hello " + args.get(0, Player.class).getName());
-        sender.sendMessage("You are " + args.get(1, Integer.class) + " years old");
+        sender.sendMessage("You are " + args.get(1, Boolean.class) + " years old");
+
+        sender.sendMessage("Il y a " + args.getRest().size() + " arguments restants");
     }
 
     private BaseCommand<ConsoleCommandSender> sub2()

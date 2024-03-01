@@ -10,6 +10,7 @@ public class ArgumentCollection implements Iterable<Argument<?>>
 {
 
     private final List<Argument<?>> arguments = new ArrayList<>();
+    private final List<String> rest = new ArrayList<>();
 
     public void add(Argument<?> argument)
     {
@@ -50,5 +51,19 @@ public class ArgumentCollection implements Iterable<Argument<?>>
     public int size()
     {
         return arguments.size();
+    }
+
+    public void addRest(String rest)
+    {
+        this.rest.add(rest);
+    }
+
+    /**
+     * Get the rest of the arguments (no used arguments)
+     * @return the rest of the arguments
+     */
+    public List<String> getRest()
+    {
+        return rest;
     }
 }

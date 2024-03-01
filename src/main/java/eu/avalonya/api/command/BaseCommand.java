@@ -176,7 +176,9 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
                 }
             }
 
-            for (int i = 0; i < this.arguments.size(); i++)
+            int i = 0;
+
+            while (i < this.arguments.size())
             {
                 Argument<?> argument = this.arguments.get(i);
                 if (args.length <= i)
@@ -197,6 +199,15 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
                     return true;
                 }
                 argument.setInput(args[i]);
+                i++;
+            }
+
+            arguments.getRest().clear();
+
+            while (i < args.length)
+            {
+                arguments.addRest(args[i]);
+                i++;
             }
 
             saveCooldown(sender);
@@ -247,6 +258,12 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
         pluginCommand.setTabCompleter(this);
     }
 
+    /**
+     * Append completions to the list if they start with the given start
+     * @param from the list to append to
+     * @param collection the collection to get completions from
+     * @param start the start to check
+     */
     private void appendIfStartsWith(List<String> from, Collection<String> collection, String start)
     {
         collection.forEach(completion -> {
