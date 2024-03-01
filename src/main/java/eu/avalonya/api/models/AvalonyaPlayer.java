@@ -1,27 +1,47 @@
 package eu.avalonya.api.models;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import eu.avalonya.api.AvalonyaAPI;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+@DatabaseTable(tableName = "player")
+@Getter
+@Setter
 public class AvalonyaPlayer
 {
 
-    private Player player;
-    private UUID uuid;
-    private Rank rank;
+    @DatabaseField(id = true)
+    private String uuid;
 
-    public AvalonyaPlayer(Player player, UUID uuid, int rank)
-    {
-        this.player = player;
-        this.uuid = uuid;
-        this.rank = Rank.rankIdToRank.get(rank);
-    }
+    @DatabaseField(canBeNull = false)
+    private String pseudo;
+
+    @DatabaseField(columnName = "rank_id", canBeNull = false, defaultValue = "0")
+    private int rankId;
+
+    @DatabaseField(columnName = "last_login", canBeNull = false)
+    private Timestamp lastLogin;
+
+    @DatabaseField(columnName = "first_login", canBeNull = false)
+    private Timestamp firstLogin;
+
+    @DatabaseField(columnName = "last_ip", canBeNull = false)
+    private String lastIp;
+
+    private Rank rank; // Not stored in db, but set in memory
+
+    private Player player; // Not stored in db, but set in memory
+
+    public AvalonyaPlayer(){}
 
     public void setPermissions(List<String> permissions)
     {
@@ -63,20 +83,6 @@ public class AvalonyaPlayer
     public String getChatFormat()
     {
         return this.getRank().getPrefixChat() + this.getPlayer().getName() + this.getRank().getColorChat() + " » ";
-    }
-    public Player getPlayer()
-    {
-        return player;
-    }
-
-    public UUID getUuid()
-    {
-        return uuid;
-    }
-
-    public Rank getRank()
-    {
-        return rank;
     }
 
 }

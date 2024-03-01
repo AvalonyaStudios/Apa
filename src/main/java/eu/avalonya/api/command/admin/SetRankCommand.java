@@ -5,7 +5,7 @@ import eu.avalonya.api.command.BaseCommand;
 import eu.avalonya.api.command.arguments.ChoiceArgument;
 import eu.avalonya.api.command.arguments.PlayerArgument;
 import eu.avalonya.api.models.Rank;
-import eu.avalonya.api.sql.RankRequest;
+import eu.avalonya.api.models.dao.PlayerAvalonyaDao;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -35,7 +35,7 @@ public class SetRankCommand extends BaseCommand<CommandSender> implements TabCom
         }
         try
         {
-            RankRequest.setRankInDb(target, rankId);
+            PlayerAvalonyaDao.updateRank(target, rankId);
             sender.sendMessage("§2➤ Mise à jour du rang du joueur §l" + target.getName() + "§r§2 à §l" + rank);
             if (target.isOnline()) target.kick(Component.text("§2Votre rang vient d'être mit à jour à §l" + rank));
         }
