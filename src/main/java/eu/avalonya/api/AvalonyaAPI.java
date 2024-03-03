@@ -1,7 +1,6 @@
 package eu.avalonya.api;
 
 import eu.avalonya.api.command.DemoCommand;
-import eu.avalonya.api.command.admin.SetRankCommand;
 import eu.avalonya.api.models.AvalonyaDatabase;
 import eu.avalonya.api.sql.MigrationUtils;
 import eu.avalonya.api.sql.SQL;
@@ -39,7 +38,6 @@ public class AvalonyaAPI extends JavaPlugin
         manageMigration();
 
         new DemoCommand().register(this);
-        new SetRankCommand().register(this);
 
         PermissionManager.loadPermissionsFromConfigFileToCache();
 

@@ -30,6 +30,13 @@ public class PlayerAvalonyaDao
         AvalonyaDatabase.getPlayerDao().update(player);
     }
 
+    public static void updateRankOffline(String uuid, int rank) throws SQLException
+    {
+        AvalonyaPlayer player = AvalonyaDatabase.getPlayerDao().queryForId(uuid);
+        player.setRankId(rank);
+        AvalonyaDatabase.getPlayerDao().update(player);
+    }
+
     public static boolean exists(Player p) throws SQLException
     {
         return AvalonyaDatabase.getPlayerDao().idExists(p.getUniqueId().toString());
