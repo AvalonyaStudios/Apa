@@ -3,6 +3,7 @@ package eu.avalonya.api.command;
 import eu.avalonya.api.command.arguments.BooleanArgument;
 import eu.avalonya.api.command.arguments.IntegerArgument;
 import eu.avalonya.api.command.arguments.PlayerArgument;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -28,7 +29,7 @@ public class DemoCommand extends BaseCommand<Player>
     public void run(Player sender, ArgumentCollection args)
     {
         sender.sendMessage("oui");
-        sender.sendMessage("Hello " + args.get(0, Player.class).getName());
+        sender.sendMessage("Hello " + args.get(0, OfflinePlayer.class).getName());
         sender.sendMessage("You are " + args.get(1, Boolean.class) + " years old");
 
         sender.sendMessage("Il y a " + args.getRest().size() + " arguments restants");

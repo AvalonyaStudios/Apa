@@ -3,12 +3,11 @@ package eu.avalonya.api.command.arguments;
 import eu.avalonya.api.command.Argument;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerArgument extends Argument<Player>
+public class PlayerArgument extends Argument<OfflinePlayer>
 {
 
     private final boolean onlineOnly;
@@ -38,9 +37,9 @@ public class PlayerArgument extends Argument<Player>
     }
 
     @Override
-    public Player get()
+    public OfflinePlayer get()
     {
-        return Bukkit.getOfflinePlayer(getInput()).getPlayer();
+        return Bukkit.getOfflinePlayer(getInput());
     }
 
     @Override
