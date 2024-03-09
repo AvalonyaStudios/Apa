@@ -1,14 +1,33 @@
 package eu.avalonya.api.models;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@DatabaseTable(tableName = "roles")
 public class Role {
 
+    @DatabaseField(generatedId = true)
+    private int id;
+
+    @DatabaseField(canBeNull = false)
     private final String name;
+
+    @DatabaseField(columnName = "town_id",foreign = true, foreignAutoRefresh = true)
+    private Town town;
+
+    @DatabaseField(canBeNull = false, defaultValue = "0")
+    private int permissions = 0;
+
     private final String color;
 
-    private Map<String, Boolean> permissions = new HashMap<>();
+    public Role()
+    {
+        this.name = "CITIZEN";
+        this.color = Color.CITIZEN.getColor();
+    }
 
     public Role(String name, String color) {
         this.name = name;
@@ -25,14 +44,6 @@ public class Role {
 
     public String getName() {
         return name;
-    }
-
-    public void setPermission(String name, boolean value){
-        permissions.put(name, value);
-    }
-
-    public boolean getPermission(String name){
-        return permissions.getOrDefault(name, false);
     }
 
     public enum Color {
