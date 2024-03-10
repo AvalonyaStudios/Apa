@@ -3,6 +3,7 @@ package eu.avalonya.api.command;
 import eu.avalonya.api.command.arguments.BooleanArgument;
 import eu.avalonya.api.command.arguments.IntegerArgument;
 import eu.avalonya.api.command.arguments.PlayerArgument;
+import eu.avalonya.api.command.arguments.RegexArgument;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -23,6 +24,7 @@ public class DemoCommand extends BaseCommand<Player>
         // Add arguments
         addArgument(PlayerArgument.class, true);
         addArgument(BooleanArgument.class, true);
+        addArgument(new RegexArgument("[a-zA-Z_]+", true));
     }
 
     @Override
