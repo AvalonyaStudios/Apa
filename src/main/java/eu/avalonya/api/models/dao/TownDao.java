@@ -21,14 +21,17 @@ public class TownDao
 
         if(mayor == null)
         {
+            AvalonyaDatabase.getTownDao().create(town);
             CitizenDao.create(player, town);
         }
         else if (mayor.getTown() != null)
         {
             throw new CitizenAlreadyHasTownException();
         }
-
-        AvalonyaDatabase.getTownDao().create(town);
+        else
+        {
+            AvalonyaDatabase.getTownDao().create(town);
+        }
 
         return town;
     }
