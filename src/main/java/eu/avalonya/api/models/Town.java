@@ -79,10 +79,6 @@ public class Town implements ItemAccess {
     @Getter
     private Date createdAt;
 
-    @Getter
-    @Setter
-    private Citizen mayor;
-
     public Town()
     {
         this.createdAt = new Date();
@@ -201,6 +197,20 @@ public class Town implements ItemAccess {
         {
             e.printStackTrace(); // TODO: Utiliser le logger
         }
+    }
+
+    public Citizen getMayor()
+    {
+        try
+        {
+            return CitizenDao.getByRole(this, Role.MAYOR.ordinal()).get(0);
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace(); // TODO: Utiliser le logger
+        }
+
+        return null;
     }
 
     public List<Citizen> getCitizens()

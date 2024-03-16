@@ -3,6 +3,7 @@ package eu.avalonya.api.models.dao;
 import eu.avalonya.api.exceptions.CitizenAlreadyHasTownException;
 import eu.avalonya.api.models.AvalonyaDatabase;
 import eu.avalonya.api.models.Citizen;
+import eu.avalonya.api.models.Role;
 import eu.avalonya.api.models.Town;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ public class TownDao
         if(mayor == null)
         {
             AvalonyaDatabase.getTownDao().create(town);
-            CitizenDao.create(player, town);
+            CitizenDao.create(player, town, Role.MAYOR);
         }
         else if (mayor.getTown() != null)
         {
@@ -30,6 +31,9 @@ public class TownDao
         }
         else
         {
+            mayor.setRole(Role.MAYOR);
+
+            AvalonyaDatabase.getCitizenDao().update(mayor);
             AvalonyaDatabase.getTownDao().create(town);
         }
 

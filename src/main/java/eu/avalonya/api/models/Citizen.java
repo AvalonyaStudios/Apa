@@ -4,6 +4,7 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import eu.avalonya.api.items.ItemAccess;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -19,27 +20,29 @@ import java.util.Date;
  * Citizen model class that represents a citizen in the Avalonya api.
  */
 @DatabaseTable(tableName = "citizens")
+@Getter
 public class Citizen implements ItemAccess {
 
     @DatabaseField(canBeNull = false, columnName = "uuid", foreign = true, foreignAutoRefresh = true)
     private AvalonyaPlayer player;
 
     @DatabaseField(defaultValue = "0", dataType = DataType.FLOAT)
-    @Getter
     @Setter
     private float money;
 
     @DatabaseField(columnName= "joined_at")
-    @Getter
     @Setter
     private Date joinedAt;
-    private ItemStack playerHead;
 
     @DatabaseField(columnName = "town_id", foreign = true, foreignAutoRefresh = true)
     private Town town;
 
-    @DatabaseField(columnName = "role_id", foreign = true, foreignAutoRefresh = true)
-    private Role role;
+    @DatabaseField(columnName = "role")
+    @Getter(AccessLevel.NONE)
+    private int role;
+
+    @Getter(AccessLevel.NONE)
+    private ItemStack playerHead;
 
     public Citizen()
     {
@@ -68,10 +71,6 @@ public class Citizen implements ItemAccess {
         this.joinedAt = new Date();
     }
 
-    public Town getTown() {
-        return town;
-    }
-
     public boolean isPlayer(Player player) {
         final Player p = this.player.getPlayer();
 
@@ -82,20 +81,26 @@ public class Citizen implements ItemAccess {
         return p.equals(player);
     }
 
-    public Player getPlayer() {
-        return player.getPlayer();
+    public void setRole(Role roleId)
+    {
+        this.role = roleId.ordinal();
     }
 
-    public void setRole(Role role){
-        this.role = role;
-    }
-
-    public Role getRole() {
-        return role;
+    public Role getRole()
+    {
+        return Role.values()[role];
     }
 
     @Override
     public ItemStack toItemStack() {
         return playerHead;
+    }
+
+    public boolean equals(Citizen citizen) {
+        if (citizen == null) {
+            return false;
+        }
+
+        return citizen.getPlayer().getPseudo().equals(player.getPseudo()) && citizen.getJoinedAt().equals(joinedAt);
     }
 }

@@ -19,6 +19,8 @@ public class AvalonyaDatabase
     private static Dao<Citizen, Integer> citizenDao = null;
     @Getter
     private static Dao<Plot, Integer> plotDao = null;
+    @Getter
+    private static Dao<Role.Custom, Integer> roleDao = null;
 
     public AvalonyaDatabase(String path, String user, String password) throws SQLException
     {
@@ -27,6 +29,7 @@ public class AvalonyaDatabase
         townDao = DaoManager.createDao(connectionSource, Town.class);
         citizenDao = DaoManager.createDao(connectionSource, Citizen.class);
         plotDao = DaoManager.createDao(connectionSource, Plot.class);
+        roleDao = DaoManager.createDao(connectionSource, Role.Custom.class);
     }
 
 }

@@ -12,7 +12,9 @@ public enum MigrationMapping
     V04_ADD_TOWNS_TABLE(4, V04_AddTownsTable.class),
     V05_ADD_ROLES_TABLE(5, V05_AddRolesTable.class),
     V06_ADD_CITIZENS_TABLE(6, V06_AddCitizensTable.class),
-    V07_ADD_PLOTS_TABLE(7, V07_AddPlotsTable.class),;
+    V07_ADD_PLOTS_TABLE(7, V07_AddPlotsTable.class),
+    V08_UPDATE_CITIZENS_ROLE(8, V08_UpdateCitizensRole.class),
+    ;
 
     private final int id;
     private final Class<? extends Migration> migrationClass;

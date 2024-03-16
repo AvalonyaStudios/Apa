@@ -2,67 +2,78 @@ package eu.avalonya.api.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-@DatabaseTable(tableName = "roles")
-public class Role {
+public enum Role
+{
 
-    @DatabaseField(generatedId = true)
-    private int id;
-
-    @DatabaseField(canBeNull = false)
-    private final String name;
-
-    @DatabaseField(columnName = "town_id",foreign = true, foreignAutoRefresh = true)
-    private Town town;
-
-    @DatabaseField(canBeNull = false, defaultValue = "0")
-    private int permissions = 0;
+    CITIZEN("§9"),
+    CUSTOM_ONE("§b"),
+    CUSTOM_TWO("§e"),
+    CUSTOM_THREE("§c"),
+    MAYOR("§6")
+    ;
 
     private final String color;
 
-    public Role()
-    {
-        this.name = "CITIZEN";
-        this.color = Color.CITIZEN.getColor();
-    }
-
-    public Role(String name, String color) {
-        this.name = name;
+    Role(String color) {
         this.color = color;
     }
 
-    public Role(String name, Color color) {
-        this(name, color.getColor());
-    }
-
-    public String getColor() {
+    public String getColor()
+    {
         return color;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public enum Color {
-        CITIZEN("§9"),
-        CUSTOM_ONE("§b"),
-        CUSTOM_TWO("§e"),
-        CUSTOM_THREE("§c"),
-        MAYOR("§6");
-
-        private final String color;
-
-        Color(String color)
+    public String getName()
+    {
+        if (this == CITIZEN || this == MAYOR)
         {
-            this.color = color;
+            return this.name().toLowerCase();
         }
 
-        public String getColor()
+        try
         {
-            return this.color;
+            return AvalonyaDatabase.getRoleDao().queryBuilder().where().eq("name" ,this.name().toLowerCase()).queryForFirst().getName();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace(); // TODO: Utiliser le logger
+        }
+        return null;
+    }
+
+    @DatabaseTable(tableName = "roles")
+    @Getter
+    @Setter
+    public static class Custom {
+
+        @DatabaseField(generatedId = true)
+        private int id;
+
+        @DatabaseField(canBeNull = false)
+        private String name;
+
+        @DatabaseField(columnName = "town_id",foreign = true, foreignAutoRefresh = true)
+        private Town town;
+
+        @DatabaseField(canBeNull = false, defaultValue = "0")
+        private int permissions = 0;
+
+        public Custom()
+        {
+            // Required by ORMLite
+        }
+
+        public Custom(String name, Town town)
+        {
+            this.name = name;
+            this.town = town;
         }
     }
 
