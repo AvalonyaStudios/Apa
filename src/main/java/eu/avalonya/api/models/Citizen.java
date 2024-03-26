@@ -23,6 +23,9 @@ import java.util.Date;
 @Getter
 public class Citizen implements ItemAccess {
 
+    @DatabaseField(id = true)
+    private String uuid;
+
     @DatabaseField(canBeNull = false, columnName = "uuid", foreign = true, foreignAutoRefresh = true)
     private AvalonyaPlayer player;
 
