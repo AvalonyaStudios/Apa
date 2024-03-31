@@ -21,10 +21,11 @@ import java.util.Date;
  */
 @DatabaseTable(tableName = "citizens")
 @Getter
-public class Citizen implements ItemAccess {
+public class Citizen implements ItemAccess
+{
 
-    @DatabaseField(id = true)
-    private String uuid;
+    @DatabaseField(generatedId = true)
+    private int id;
 
     @DatabaseField(canBeNull = false, columnName = "uuid", foreign = true, foreignAutoRefresh = true)
     private AvalonyaPlayer player;
