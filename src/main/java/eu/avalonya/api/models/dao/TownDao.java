@@ -32,9 +32,10 @@ public class TownDao
         else
         {
             mayor.setRole(Role.MAYOR);
+            mayor.setTown(town);
 
-            AvalonyaDatabase.getCitizenDao().update(mayor);
             AvalonyaDatabase.getTownDao().create(town);
+            AvalonyaDatabase.getCitizenDao().update(mayor);
         }
 
         return town;
