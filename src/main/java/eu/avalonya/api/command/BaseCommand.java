@@ -226,21 +226,18 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
     {
         final List<String> completions = new ArrayList<>();
 
-        BaseCommand<?> subCommand = subCommands.get(strings[0]);
-        if (subCommand != null)
-        {
-            return subCommand.onTabComplete(commandSender, command, s, Arrays.copyOfRange(strings, 1, strings.length));
-        }
-        else
-        {
-            if (strings.length == 1)
-            {
-                appendIfStartsWith(completions, subCommands.keySet(), strings[0]);
-            }
-            if (arguments.size() > strings.length - 1)
-            {
-                Argument<?> argument = arguments.get(strings.length - 1);
-                appendIfStartsWith(completions, argument.getCompletions(), strings[strings.length - 1]);
+        if (strings.length > 0) {
+            BaseCommand<?> subCommand = subCommands.get(strings[0]);
+            if (subCommand != null) {
+                return subCommand.onTabComplete(commandSender, command, s, Arrays.copyOfRange(strings, 1, strings.length));
+            } else {
+                if (strings.length == 1) {
+                    appendIfStartsWith(completions, subCommands.keySet(), strings[0]);
+                }
+                if (arguments.size() > strings.length - 1) {
+                    Argument<?> argument = arguments.get(strings.length - 1);
+                    appendIfStartsWith(completions, argument.getCompletions(), strings[strings.length - 1]);
+                }
             }
         }
         return completions;
