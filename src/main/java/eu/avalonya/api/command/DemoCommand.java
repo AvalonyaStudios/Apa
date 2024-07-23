@@ -1,7 +1,6 @@
 package eu.avalonya.api.command;
 
 import eu.avalonya.api.command.arguments.BooleanArgument;
-import eu.avalonya.api.command.arguments.IntegerArgument;
 import eu.avalonya.api.command.arguments.PlayerArgument;
 import eu.avalonya.api.command.arguments.RegexArgument;
 import org.bukkit.OfflinePlayer;

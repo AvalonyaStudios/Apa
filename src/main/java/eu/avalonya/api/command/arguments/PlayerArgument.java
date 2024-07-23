@@ -21,7 +21,7 @@ public class PlayerArgument extends Argument<OfflinePlayer>
 
     public PlayerArgument()
     {
-        this(false);
+        this(true);
     }
 
     @Override
