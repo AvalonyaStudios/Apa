@@ -1,6 +1,8 @@
 package eu.avalonya.api.command;
 
 import eu.avalonya.api.AvalonyaAPI;
+import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
@@ -20,11 +22,16 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
     private final Component INVALID_SENDER_TYPE = Component.text("Vous n'avez pas accès à cette commande.").color(NamedTextColor.RED);
     private final Component INSUFFICIENT_PERMISSION = Component.text("Vous n'avez pas accès à cette commande.").color(NamedTextColor.RED);
 
+    @Getter
     private final String name;
     private final ArgumentCollection arguments = new ArgumentCollection();
+    private final ArgumentCollection argumentsGive = new ArgumentCollection();
     private final Map<String, BaseCommand<?>> subCommands = new HashMap<>();
     private final List<UUID> onlyAccess = new ArrayList<>();
+    @Getter
     private final List<String> permissions = new ArrayList<>();
+    @Getter
+    @Setter
     protected int cooldown = 0;
     private final Map<T, Long> cooldowns = new HashMap<>();
 
@@ -35,11 +42,6 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
     public BaseCommand(@NotNull String name)
     {
         this.name = name;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public void addArgument(Argument<?> argument)
@@ -88,28 +90,13 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
         this.permissions.addAll(Arrays.asList(permissions));
     }
 
-    public List<String> getPermissions()
-    {
-        return permissions;
-    }
-
-    public void setCooldown(int cooldown)
-    {
-        this.cooldown = cooldown;
-    }
-
-    public int getCooldown()
-    {
-        return cooldown;
-    }
-
     private boolean canExecute(T sender)
     {
-        if (onlyAccess.size() > 0 && sender instanceof Entity)
+        if (!onlyAccess.isEmpty() && sender instanceof Entity)
         {
             return onlyAccess.contains(((Entity) sender).getUniqueId());
         }
-        if (getPermissions().size() > 0)
+        if (!getPermissions().isEmpty())
         {
             for (String permission : getPermissions())
             {
@@ -146,77 +133,101 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
         return usage.toString();
     }
 
+    private boolean hasPermission(T sender) {
+        if (!canExecute(sender)) {
+            sender.sendMessage(INSUFFICIENT_PERMISSION);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkCooldown(T sender) {
+        if (inCooldown(sender)) {
+            sender.sendMessage(
+                    Component.text("Vous devez attendre " + (cooldowns.get(sender) - System.currentTimeMillis()) / 1000 + " secondes avant de pouvoir réutiliser cette commande.")
+                            .color(NamedTextColor.RED)
+            );
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleSubCommand(T sender, Command command, String s, String[] args) {
+        if (args.length > 0) {
+            BaseCommand<?> subCommand = subCommands.get(args[0]);
+            if (subCommand != null) {
+                subCommand.onCommand(sender, command, s, Arrays.copyOfRange(args, 1, args.length));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean validateArguments(T sender, String[] args) {
+        int i = 0;
+
+        argumentsGive.clear();
+
+        while (i < this.arguments.size()) {
+            final Argument<?> argument = this.arguments.get(i);
+            if (args.length <= i) {
+                if (argument.isRequired()) {
+                    sender.sendMessage(
+                            Component.text(getUsage()).color(NamedTextColor.RED)
+                    );
+                    return false;
+                }
+                break;
+            }
+            if (!argument.test(args[i])) {
+                sender.sendMessage(
+                        Component.text(args[i] + " n'est pas un argument valide.").color(NamedTextColor.RED)
+                );
+                return false;
+            }
+            if (args[i] != null) {
+                argument.setInput(args[i]);
+                argumentsGive.add(argument);
+            }
+            i++;
+        }
+
+        argumentsGive.getRest().clear();
+
+        while (i < args.length) {
+            argumentsGive.addRest(args[i]);
+            i++;
+        }
+        return true;
+    }
+
+    private void processCommand(T sender, String[] args) {
+        saveCooldown(sender);
+        run(sender, argumentsGive);
+    }
+
+    private void handleException(CommandSender commandSender, ClassCastException e) {
+        commandSender.sendMessage(INVALID_SENDER_TYPE);
+        AvalonyaAPI.getInstance().getLogger().severe(e.getMessage());
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
     {
         try
         {
             T sender = (T) commandSender;
-            if (!canExecute(sender))
-            {
-                sender.sendMessage(INSUFFICIENT_PERMISSION);
-                return true;
-            }
 
-            if (inCooldown(sender))
-            {
-                sender.sendMessage(
-                        Component.text("Vous devez attendre " + (cooldowns.get(sender) - System.currentTimeMillis()) / 1000 + " secondes avant de pouvoir réutiliser cette commande.").color(NamedTextColor.RED)
-                );
-                return true;
-            }
+            if (!hasPermission(sender)) return true;
+            if (checkCooldown(sender)) return true;
+            if (handleSubCommand(sender, command, s, args)) return true;
+            if (!validateArguments(sender, args)) return true;
 
-            if (args.length > 0)
-            {
-                BaseCommand<?> subCommand = subCommands.get(args[0]);
-                if (subCommand != null)
-                {
-                    subCommand.onCommand(sender, command, s, Arrays.copyOfRange(args, 1, args.length));
-                    return true;
-                }
-            }
-
-            int i = 0;
-
-            while (i < this.arguments.size())
-            {
-                Argument<?> argument = this.arguments.get(i);
-                if (args.length <= i)
-                {
-                    if (argument.isRequired())
-                    {
-                        sender.sendMessage(
-                                Component.text(getUsage()).color(NamedTextColor.RED)
-                        );
-                        return true;
-                    }
-                }
-                if (!argument.test(args[i]))
-                {
-                    sender.sendMessage(
-                            Component.text(args[i] + " n'est pas un argument valide.").color(NamedTextColor.RED)
-                    );
-                    return true;
-                }
-                argument.setInput(args[i]);
-                i++;
-            }
-
-            arguments.getRest().clear();
-
-            while (i < args.length)
-            {
-                arguments.addRest(args[i]);
-                i++;
-            }
-
-            saveCooldown(sender);
-            run(sender, arguments);
+            processCommand(sender, args);
         }
         catch (ClassCastException e)
         {
-            commandSender.sendMessage(INVALID_SENDER_TYPE);
-            AvalonyaAPI.getInstance().getLogger().severe(e.getMessage());
+            handleException(commandSender, e);
         }
         return true;
     }
