@@ -1,0 +1,7 @@
+name: AvalonyaAPI
+version: '${project.version}'
+main: eu.avalonya.api.AvalonyaAPI
+api-version: '1.21'
+commands:
+  test:
+    description: test command

@@ -7,6 +7,7 @@ import eu.avalonya.api.sql.SQL;
 import eu.avalonya.api.utils.ConfigFilesManager;
 import eu.avalonya.api.utils.CustomConfigFile;
 import eu.avalonya.api.utils.PermissionManager;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import fr.mrmicky.fastinv.FastInvManager;
@@ -17,7 +18,9 @@ import java.sql.SQLException;
 public class AvalonyaAPI extends JavaPlugin
 {
 
+    @Getter
     private static AvalonyaAPI instance;
+    @Getter
     private static SQL sqlInstance;
 
     private static AvalonyaDatabase avalonyaDatabase;
@@ -32,24 +35,26 @@ public class AvalonyaAPI extends JavaPlugin
 
         FileConfiguration fSql = ConfigFilesManager.getFile("sql").get();
 
-        AvalonyaAPI.sqlInstance = new SQL("jdbc:mysql://", fSql.getString("host"), fSql.getString("database"), fSql.getString("user"), fSql.getString("password"));
-        AvalonyaAPI.sqlInstance.connection();
+        if (!Bukkit.getVersion().contains("MockBukkit")) {
+            AvalonyaAPI.sqlInstance = new SQL("jdbc:mysql://", fSql.getString("host"), fSql.getString("database"), fSql.getString("user"), fSql.getString("password"));
+            AvalonyaAPI.sqlInstance.connection();
 
-        manageMigration();
+            manageMigration();
+
+            try
+            {
+                avalonyaDatabase = new AvalonyaDatabase("jdbc:mysql://" + fSql.getString("host") + "/" + fSql.getString("database") + "?autoreconnect=true", fSql.getString("user"), fSql.getString("password"));
+            }
+            catch (SQLException e)
+            {
+                this.getLogger().severe(e.getMessage());
+                Bukkit.getPluginManager().disablePlugin(this);
+            }
+        }
 
         new DemoCommand().register(this);
 
         PermissionManager.loadPermissionsFromConfigFileToCache();
-
-        try
-        {
-            avalonyaDatabase = new AvalonyaDatabase("jdbc:mysql://" + fSql.getString("host") + "/" + fSql.getString("database") + "?autoreconnect=true", fSql.getString("user"), fSql.getString("password"));
-        }
-        catch (SQLException e)
-        {
-            this.getLogger().severe(e.getMessage());
-            Bukkit.getPluginManager().disablePlugin(this);
-        }
     }
 
     public static AvalonyaDatabase getDb()
@@ -67,17 +72,9 @@ public class AvalonyaAPI extends JavaPlugin
     @Override
     public void onDisable()
     {
-        AvalonyaAPI.sqlInstance.disconnect();
-    }
-
-    public static AvalonyaAPI getInstance()
-    {
-        return instance;
-    }
-
-    public static SQL getSqlInstance()
-    {
-        return sqlInstance;
+        if (sqlInstance != null) {
+            AvalonyaAPI.sqlInstance.disconnect();
+        }
     }
 
 }
