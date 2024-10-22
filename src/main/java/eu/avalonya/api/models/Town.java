@@ -4,9 +4,13 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import eu.avalonya.api.items.ItemAccess;
-import eu.avalonya.api.models.dao.CitizenDao;
 import eu.avalonya.api.models.dao.PlotDao;
+import eu.avalonya.api.models.enums.TownPermission;
+import eu.avalonya.api.repository.CitizenRepository;
+import eu.avalonya.api.repository.PlotRepository;
+import it.unimi.dsi.fastutil.Pair;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Chunk;
@@ -21,74 +25,22 @@ import java.util.*;
 /**
  * Town model class that represents a town in the Avalonya api.
  */
-@DatabaseTable(tableName = "towns")
-public class Town implements ItemAccess {
+@Getter
+@Setter
+@NoArgsConstructor
+public class Town extends AbstractModel implements ItemAccess {
 
-    @DatabaseField(generatedId = true)
-    @Getter
     private int id;
-
-    @DatabaseField(canBeNull = false, unique = true)
-    @Getter
-    @Setter
     private String name;
-
-    @DatabaseField(columnName = "politics", defaultValue = "")
-    @Getter
-    @Setter
     private String politicalStatus = "";
-
-    @DatabaseField(defaultValue = "0", dataType = DataType.FLOAT)
-    @Getter
     private float money = 0.0f;
-
-    @DatabaseField(defaultValue = "0", dataType = DataType.FLOAT)
-    @Getter
-    @Setter
     private float taxes = 0.0f;
-
-    @DatabaseField(columnName = "taxes_enabled", defaultValue = "false", dataType = DataType.BOOLEAN)
-    @Setter
-    private boolean taxesEnabled = false;
-
-    @DatabaseField(columnName = "spawn_hostile_mob", defaultValue = "false", dataType = DataType.BOOLEAN)
-    @Setter
-    private boolean spawnHostileMob = false;
-
-    @DatabaseField(columnName = "fire_spread", defaultValue = "false", dataType = DataType.BOOLEAN)
-    @Setter
-    private boolean fireSpread = false;
-
-    @DatabaseField(columnName = "explosions", defaultValue = "false", dataType = DataType.BOOLEAN)
-    @Setter
-    private boolean explosions = false;
-
-    @DatabaseField(columnName = "public", defaultValue = "false", dataType = DataType.BOOLEAN)
-    private boolean publicTown = false;
-
-    @DatabaseField(columnName = "friendly_fire", defaultValue = "false", dataType = DataType.BOOLEAN)
-    @Setter
-    private boolean friendlyFire = false;
-
-    @DatabaseField(columnName = "spawn_location", dataType = DataType.STRING)
-    @Getter
-    @Setter
+    private int permissions = 0;
     private String spawnLocation;
-
-    @DatabaseField(columnName= "created_at")
-    @Getter
     private Date createdAt;
 
-    public Town()
-    {
-        this.createdAt = new Date();
-        // Required by ORMLite
-    }
-
-    public Town(String name)
-    {
-        this.name = name;
-        this.createdAt = new Date();
+    public CitizenRepository getCitizens() {
+        return new CitizenRepository(List.of(this.name));
     }
 
     public float deposit(float amount) {
@@ -111,46 +63,8 @@ public class Town implements ItemAccess {
         return taxes;
     }
 
-    public List<Plot> getPlots()
-    {
-        try {
-            return PlotDao.getPlots(this);
-        } catch (SQLException e) {
-            e.printStackTrace(); // TODO: Utiliser le logger
-        }
-
-        return new ArrayList<>();
-    }
-
-    /**
-     * Ajoute un chunk à la ville ou change le propriétaire du chunk si il est déjà revendiqué.
-     * @param chunk
-     */
-    public void addPlot(Chunk chunk)
-    {
-        try
-        {
-            if (PlotDao.isClaimed(chunk))
-            {
-                Plot plot = PlotDao.getPlot(chunk);
-
-                if (plot.getTown().equals(this))
-                {
-                    return;
-                }
-
-                plot.setTown(this);
-                PlotDao.update(plot);
-            }
-            else
-            {
-                PlotDao.create(this, chunk);
-            }
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace(); // TODO: Utiliser le logger
-        }
+    public PlotRepository getPlots() {
+        return new PlotRepository(List.of(this.name));
     }
 
     /**
@@ -169,7 +83,7 @@ public class Town implements ItemAccess {
                 return;
             }
 
-            addPlot(chunk);
+            this.getPlots().save(new Plot(chunk, this));
         }
         catch (SQLException e)
         {
@@ -199,60 +113,12 @@ public class Town implements ItemAccess {
         }
     }
 
-    public Citizen getMayor()
-    {
-        try
-        {
-            return CitizenDao.getByRole(this, Role.MAYOR.ordinal()).get(0);
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace(); // TODO: Utiliser le logger
-        }
-
-        return null;
+    public boolean hasPermission(TownPermission permission) {
+        return (this.permissions & (1 << permission.ordinal())) != 0;
     }
 
-    public List<Citizen> getCitizens()
-    {
-        try
-        {
-            return CitizenDao.getByTown(this);
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace(); // TODO: Utiliser le logger
-        }
-
-        return new ArrayList<>();
-    }
-
-    public boolean hasTaxesEnabled() {
-        return taxesEnabled;
-    }
-
-    public boolean hasSpawnHostileMob() {
-        return spawnHostileMob;
-    }
-
-    public boolean hasFireSpread() {
-        return fireSpread;
-    }
-
-    public boolean hasExplosions() {
-        return explosions;
-    }
-
-    public void setPublic(boolean publicTown) {
-        this.publicTown = publicTown;
-    }
-
-    public boolean isPublic() {
-        return publicTown;
-    }
-
-    public boolean hasFriendlyFire() {
-        return friendlyFire;
+    public void addPermission(TownPermission permission) {
+        this.permissions |= (1 << permission.ordinal());
     }
 
     @Override
@@ -267,4 +133,22 @@ public class Town implements ItemAccess {
         return item;
     }
 
+    @Override
+    public Pair<String, String> getId() {
+        return Pair.of("town_name", this.name);
+    }
+
+    @Override
+    public Map<String, String> getRepositoryAttributes() {
+        return Map.of(
+                "town_name", this.name
+        );
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        return Map.of(
+                "name", this.name
+        );
+    }
 }

@@ -1,5 +1,6 @@
 package eu.avalonya.api;
 
+import com.google.gson.Gson;
 import eu.avalonya.api.command.DemoCommand;
 import eu.avalonya.api.models.AvalonyaDatabase;
 import eu.avalonya.api.sql.MigrationUtils;
@@ -22,6 +23,7 @@ public class AvalonyaAPI extends JavaPlugin
     private static AvalonyaAPI instance;
     @Getter
     private static SQL sqlInstance;
+    private static Gson gson = new Gson();
 
     private static AvalonyaDatabase avalonyaDatabase;
 
@@ -30,6 +32,7 @@ public class AvalonyaAPI extends JavaPlugin
     {
         instance = this;
 
+        new CustomConfigFile(AvalonyaAPI.getInstance(), "backend.yml", "backend");
         CustomConfigFile sqlConfig = new CustomConfigFile(AvalonyaAPI.getInstance(), "database.yml", "sql");
         CustomConfigFile permissionsConfig = new CustomConfigFile(AvalonyaAPI.getInstance(), "permissions.yml", "permissions");
 
@@ -75,6 +78,10 @@ public class AvalonyaAPI extends JavaPlugin
         if (sqlInstance != null) {
             AvalonyaAPI.sqlInstance.disconnect();
         }
+    }
+
+    public static Gson getGson() {
+        return gson;
     }
 
 }
