@@ -151,4 +151,14 @@ public class Town extends AbstractModel implements ItemAccess {
                 "name", this.name
         );
     }
+
+    @Deprecated
+    public Citizen getMayor() {
+        return null;
+    }
+
+    @Deprecated
+    public void addPlot(Chunk chunk) {
+
+    }
 }
