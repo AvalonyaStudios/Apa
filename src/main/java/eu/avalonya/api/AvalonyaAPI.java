@@ -2,6 +2,7 @@ package eu.avalonya.api;
 
 import com.google.gson.Gson;
 import eu.avalonya.api.command.DemoCommand;
+import eu.avalonya.api.inventory.History;
 import eu.avalonya.api.models.AvalonyaDatabase;
 import eu.avalonya.api.sql.MigrationUtils;
 import eu.avalonya.api.sql.SQL;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import fr.mrmicky.fastinv.FastInvManager;
+import org.bukkit.event.inventory.HopperInventorySearchEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
@@ -58,6 +60,8 @@ public class AvalonyaAPI extends JavaPlugin
         new DemoCommand().register(this);
 
         PermissionManager.loadPermissionsFromConfigFileToCache();
+
+        Bukkit.getPluginManager().registerEvents(new History(), this);
     }
 
     public static AvalonyaDatabase getDb()
