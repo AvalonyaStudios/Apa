@@ -109,7 +109,7 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
         return true;
     }
 
-    private void saveCooldown(T sender)
+    public void saveCooldown(T sender)
     {
         if (getCooldown() > 0)
         {
@@ -117,7 +117,7 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
         }
     }
 
-    private boolean inCooldown(T sender)
+    public boolean inCooldown(T sender)
     {
         return getCooldown() > 0 && cooldowns.containsKey(sender) && cooldowns.get(sender) > System.currentTimeMillis();
     }
@@ -292,6 +292,14 @@ public abstract class BaseCommand<T extends CommandSender> implements CommandExe
                 run.run(sender, args);
             }
         };
+    }
+
+    /**
+     * Cancel the current cooldown on the command if it has one activated
+     * @param sender The person who sent the command
+     */
+    public void cancelCooldown(T sender) {
+        this.cooldowns.remove(sender);
     }
 
 }
