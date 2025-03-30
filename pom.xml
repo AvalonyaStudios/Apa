@@ -6,6 +6,7 @@
 
     <groupId>eu.avalonya</groupId>
     <artifactId>AvalonyaAPI</artifactId>
+    <version>1.0.0</version>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
