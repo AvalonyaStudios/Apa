@@ -2,17 +2,3 @@ name: AvalonyaAPI
 version: '${project.version}'
 main: eu.avalonya.api.AvalonyaAPI
 api-version: '1.21'
-commands:
-  demo:
-    description: Demo command
-    permission: avalonya.admin
-permissions:
-  avalonya.admin:
-    description: Permissions des commandes admin
-    default: false
-  avalonya.*:
-    description: all perm
-    default: op
-    children:
-      avalonya.admin: true
-
